@@ -1,0 +1,997 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đề cương chi tiết - Ứng dụng AI trong xây dựng phần mềm giám sát và ưu tiên cảnh báo cho hệ thống NOC/SOC trên thiết bị di động</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --line:#dde5f2;
+      --text:#172033;
+      --muted:#5d6985;
+      --primary:#2257d5;
+      --primary-soft:#eaf1ff;
+      --green:#169b62;
+      --green-soft:#eaf8f1;
+      --orange:#c67a00;
+      --orange-soft:#fff4df;
+      --red:#cf3d3d;
+      --red-soft:#fff0f0;
+      --shadow:0 10px 30px rgba(23,32,51,0.08);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Roboto, "Segoe UI", Arial, sans-serif;
+      background:linear-gradient(180deg,#eef3fb 0%, #f8faff 100%);
+      color:var(--text);
+      line-height:1.7;
+    }
+    .wrap{max-width:1080px;margin:0 auto;padding:16px}
+    .hero{
+      background:linear-gradient(135deg,#1f53cf 0%, #3d82ff 100%);
+      color:#fff;border-radius:26px;padding:24px 18px;box-shadow:var(--shadow);margin-top:10px;
+    }
+    .badge{
+      display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.16);
+      font-size:12px;font-weight:800;letter-spacing:.3px;margin-bottom:10px;
+    }
+    h1{margin:0 0 10px;font-size:clamp(24px,5vw,36px);line-height:1.24}
+    .subtitle{margin:0;font-size:15px;color:rgba(255,255,255,.94)}
+    .toc{
+      position:sticky;top:10px;z-index:6;margin:14px 0 0;
+      background:rgba(255,255,255,.9);backdrop-filter:blur(10px);
+      border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:0 8px 24px rgba(23,32,51,0.06);
+    }
+    .toc-title{font-size:13px;font-weight:800;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px}
+    .toc-links{display:flex;gap:8px;flex-wrap:wrap}
+    .toc a{
+      text-decoration:none;color:var(--primary);background:var(--primary-soft);
+      border:1px solid #dbe6ff;padding:8px 12px;border-radius:999px;font-size:13px;font-weight:700;
+    }
+    .section{
+      margin-top:16px;background:var(--card);border:1px solid var(--line);
+      border-radius:var(--radius);padding:18px 16px;box-shadow:var(--shadow);
+    }
+    .section h2{margin:0 0 12px;font-size:23px;line-height:1.3}
+    .section h3{margin:18px 0 8px;font-size:18px;line-height:1.35;color:#1e2e4d}
+    p{margin:10px 0}
+    .lead{font-size:16px;color:#21304f}
+    ul,ol{margin:8px 0 8px 22px;padding:0}
+    li{margin:6px 0}
+    .highlight,.note,.quote{
+      border-radius:16px;padding:14px;margin-top:12px;border:1px solid var(--line);
+    }
+    .highlight{background:#fff9e9;border-color:#f1dea1}
+    .note{background:#eefaf3;border-color:#cfead9}
+    .quote{background:#f6f8fd}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+    .mini{background:#fbfcff;border:1px solid var(--line);border-radius:14px;padding:14px}
+    .mini h4{margin:0 0 8px;font-size:15px;color:#223354}
+    .chapter{
+      display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--line);
+      border-radius:16px;background:#fbfdff;margin:12px 0;
+    }
+    .num{
+      width:38px;height:38px;min-width:38px;border-radius:12px;background:var(--primary-soft);
+      color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:800;
+    }
+    .chapter h3{margin:0 0 6px;font-size:18px}
+    .muted{color:var(--muted)}
+    .svg-wrap{
+      margin-top:14px;border:1px solid var(--line);border-radius:22px;background:#fbfdff;padding:14px;overflow:hidden;
+    }
+    .diagram-grid{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:14px}
+    .zone{
+      position:relative;border:1px solid var(--line);border-radius:20px;padding:14px;background:#fff;min-height:430px;
+    }
+    .zone.blue{background:linear-gradient(180deg,#f7faff 0%, #eef5ff 100%)}
+    .zone.green{background:linear-gradient(180deg,#f8fffb 0%, #edf9f2 100%)}
+    .zone.orange{background:linear-gradient(180deg,#fffdf8 0%, #fff5e7 100%)}
+    .zone.red{background:linear-gradient(180deg,#fffafa 0%, #fff1f1 100%)}
+    .zone-label{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;
+      border:1px solid rgba(0,0,0,.06);font-size:13px;font-weight:800;margin-bottom:12px;
+    }
+    .blue .zone-label{color:var(--primary)}
+    .green .zone-label{color:var(--green)}
+    .orange .zone-label{color:var(--orange)}
+    .red .zone-label{color:var(--red)}
+    .card{
+      background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px;
+      box-shadow:0 8px 18px rgba(24,35,54,.05);
+    }
+    .card h4{
+      margin:0 0 8px;font-size:15px;line-height:1.35;display:flex;align-items:center;gap:8px;
+    }
+    .card p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}
+    .mini-list{margin:10px 0 0 0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.6}
+    .connector{
+      position:absolute;top:50%;right:-17px;transform:translateY(-50%);width:34px;height:34px;border-radius:999px;
+      background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+      box-shadow:0 8px 18px rgba(24,35,54,.08);z-index:4;
+    }
+    .icon{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+    .pill{
+      display:inline-block;margin:4px 6px 0 0;border:1px solid var(--line);background:#fff;border-radius:999px;
+      padding:7px 11px;font-size:13px;font-weight:700;color:#445473;
+    }
+    .footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 10px 30px}
+    @media (min-width:760px){
+      .wrap{padding:22px}
+      .hero{padding:28px 26px}
+      .section{padding:22px}
+      .grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:1040px){
+      .diagram-grid{grid-template-columns:1fr 1fr}
+      .connector{display:none}
+      .zone{min-height:auto}
+    }
+    @media (max-width:640px){
+      .diagram-grid{grid-template-columns:1fr}
+      .wrap{padding:14px}
+    }
+  
+    .flow-diagram{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:repeat(4,minmax(180px,1fr));
+      gap:12px;
+      align-items:stretch;
+    }
+    .flow-step{
+      position:relative;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      box-shadow:0 8px 18px rgba(24,35,54,.05);
+    }
+    .flow-step h4{
+      margin:0 0 8px;
+      font-size:15px;
+      line-height:1.35;
+      color:#203154;
+    }
+    .flow-step p{
+      margin:0;
+      font-size:13px;
+      line-height:1.65;
+      color:var(--muted);
+    }
+    .flow-arrow{
+      position:absolute;
+      top:50%;
+      right:-18px;
+      transform:translateY(-50%);
+      width:36px;
+      height:36px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 8px 18px rgba(24,35,54,.08);
+    }
+    .data-table-wrap{
+      margin-top:14px;
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 8px 18px rgba(24,35,54,.05);
+    }
+    table.func-table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:760px;
+    }
+    .func-table th,
+    .func-table td{
+      border-bottom:1px solid var(--line);
+      padding:12px 14px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+      line-height:1.6;
+    }
+    .func-table th{
+      background:#f6f9ff;
+      color:#213456;
+      font-weight:800;
+    }
+    .func-table tr:last-child td{
+      border-bottom:none;
+    }
+    @media (max-width:1040px){
+      .flow-diagram{grid-template-columns:1fr 1fr}
+      .flow-arrow{display:none}
+    }
+    @media (max-width:640px){
+      .flow-diagram{grid-template-columns:1fr}
+    }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="badge">ĐỀ CƯƠNG CHI TIẾT / BẢN BỔ SUNG</div>
+      <h1>Ứng dụng AI trong xây dựng phần mềm giám sát và ưu tiên cảnh báo cho hệ thống NOC/SOC trên thiết bị di động</h1>
+      <p class="subtitle">
+        Tài liệu được trình bày theo văn phong khoa học, định hướng quản lý nhà nước, làm rõ đặc thù mạng WAN chuyên dùng, mô hình công bố dữ liệu an toàn ra Internet, định hướng ứng dụng thiết bị di động theo mô hình ứng dụng web/PWA đa nền tảng và phương án ứng dụng trí tuệ nhân tạo trong giám sát di động.
+      </p>
+    </header>
+
+    <nav class="toc">
+      <div class="toc-title">Mục lục nhanh</div>
+      <div class="toc-links">
+        <a href="#mo-dau">Mở đầu</a>
+        <a href="#muc-tieu">Mục tiêu</a>
+        <a href="#pham-vi">Phạm vi nghiên cứu</a>
+        <a href="#phuong-phap">Phương pháp nghiên cứu</a>
+        <a href="#doi-tuong">Đối tượng khảo sát</a>
+        <a href="#ke-hoach">Kế hoạch thực hiện</a>
+        <a href="#webapp-pwa">Ứng dụng web / PWA</a>
+        <a href="#so-do">Sơ đồ kiến trúc</a>
+        <a href="#luong-du-lieu">Luồng dữ liệu</a>
+        <a href="#mo-hinh-ai">Mô hình trí tuệ nhân tạo</a>
+        <a href="#bang-chuc-nang">Bảng chức năng</a>
+        <a href="#de-cuong">Đề cương chi tiết</a>
+        <a href="#tai-lieu">Tài liệu tham khảo</a>
+      </div>
+    </nav>
+
+    <section class="section" id="mo-dau">
+      <h2>1. Phần mở đầu</h2>
+      <p class="lead">
+        Trong bối cảnh đẩy mạnh xây dựng Chính phủ số, chính quyền số và chuyển đổi số quốc gia, hạ tầng mạng diện rộng dùng riêng trong các cơ quan nhà nước giữ vai trò nền tảng để bảo đảm kết nối liên thông, chia sẻ dữ liệu, vận hành hệ thống thông tin và cung cấp dịch vụ công. Đây là hệ thống mạng có tính chất đặc thù, được tổ chức trên các đường truyền riêng, có yêu cầu cao về tính ổn định, tính sẵn sàng, khả năng giám sát tập trung và đặc biệt là yêu cầu bảo đảm an toàn, an ninh thông tin.
+      </p>
+      <p>
+        Trên thực tế, mạng WAN chuyên dùng của các cơ quan nhà nước thường được triển khai theo mô hình phân cấp từ trung ương tới địa phương, bao gồm nhiều điểm kết nối tại cấp bộ, tỉnh, huyện, xã và các đơn vị trực thuộc. Tại mỗi điểm mạng có thể tồn tại nhiều nhóm thiết bị khác nhau như router, firewall, switch, máy chủ, máy trạm và các thiết bị đầu cuối. Cùng với quá trình mở rộng quy mô kết nối, số lượng thiết bị và số lượng cảnh báo phát sinh trong quá trình vận hành ngày càng lớn, đặt ra yêu cầu cao hơn đối với công tác giám sát tập trung.
+      </p>
+      <p>
+        Hiện nay, việc giám sát thường được phân tách thành hai nhóm nghiệp vụ chính: giám sát vận hành hạ tầng mạng và dịch vụ theo hướng NOC; giám sát an toàn, an ninh thông tin theo hướng SOC. Các trung tâm điều hành có thể sử dụng đồng thời nhiều nền tảng khác nhau như Riverbed đối với NOC và LogRhythm, EDR, Tenable, IPS đối với SOC. Điều này mang lại khả năng quan sát đa chiều, nhưng đồng thời cũng làm phát sinh thách thức về tích hợp dữ liệu, chuẩn hóa cảnh báo, loại bỏ trùng lặp, phân loại mức độ nghiêm trọng và hỗ trợ cán bộ trực ra quyết định kịp thời.
+      </p>
+      <p>
+        Bên cạnh đó, yêu cầu giám sát trên thiết bị di động đang ngày càng trở nên cấp thiết. Cán bộ trực ca, quản trị hệ thống, lãnh đạo đơn vị hoặc lực lượng phản ứng nhanh có nhu cầu tiếp cận tình trạng mạng, cảnh báo trọng yếu và diễn biến sự cố ở mọi thời điểm, mọi địa điểm. Tuy nhiên, vấn đề đặt ra là mạng WAN chuyên dùng trong cơ quan nhà nước không vận hành trực tiếp trên Internet công cộng, trong khi thiết bị di động lại sử dụng kết nối Internet. Nếu không có phương thức kết nối hợp lý, việc đưa dữ liệu giám sát từ mạng WAN ra ngoài sẽ tiềm ẩn nguy cơ mất an toàn thông tin.
+      </p>
+      <p>
+        Vì vậy, việc nghiên cứu một kiến trúc trung gian an toàn để phân phối dữ liệu giám sát từ mạng WAN chuyên dùng tới thiết bị di động là yêu cầu quan trọng. Theo định hướng phù hợp, dữ liệu giám sát không được đưa ra ngoài theo cách truy cập trực tiếp từ Internet vào hệ thống lõi, mà cần đi qua các lớp trung gian có kiểm soát như máy chủ tích hợp, vùng đệm dữ liệu, vùng DMZ, API Gateway hoặc các cơ chế truy cập an toàn như VPN, xác thực nhiều lớp, phân quyền theo vai trò và mã hóa đường truyền. Cách tiếp cận này vừa bảo đảm nguyên tắc tách biệt mạng lõi với Internet, vừa tạo điều kiện cho việc hình thành một ứng dụng giám sát trên thiết bị di động có khả năng khai thác dữ liệu đúng phạm vi, đúng thẩm quyền.
+      </p>
+      <p>
+        Ngoài bài toán kết nối an toàn, một khó khăn khác là khối lượng dữ liệu giám sát quá lớn và phức tạp. Nếu chỉ hiển thị toàn bộ cảnh báo thô lên điện thoại, người sử dụng sẽ khó nắm bắt được bản chất vấn đề, khó nhận diện sự cố ưu tiên và khó triển khai phản ứng kịp thời. Đây chính là khoảng trống để trí tuệ nhân tạo phát huy vai trò. Thông qua các phương pháp học máy, hệ thống có thể phân tích đặc trưng của cảnh báo, phát hiện bất thường, chấm điểm mức độ ưu tiên, gom nhóm các cảnh báo có liên quan và đưa ra bản tóm tắt ngắn gọn, dễ hiểu, phù hợp với ngữ cảnh sử dụng trên thiết bị di động.
+      </p>
+      <p>
+        Trên cơ sở đó, đề tài <strong>“Ứng dụng AI trong xây dựng phần mềm giám sát và ưu tiên cảnh báo cho hệ thống NOC/SOC trên thiết bị di động”</strong> Được lựa chọn nhằm nghiên cứu, đề xuất và xây dựng thử nghiệm một giải pháp phần mềm có khả năng tiếp nhận dữ liệu từ hệ thống giám sát trong mạng WAN chuyên dùng, xử lý và phân tích bằng AI, sau đó cung cấp thông tin giám sát đã chọn lọc qua môi trường Internet theo mô hình kết nối an toàn, phục vụ công tác chỉ huy, điều hành và trực giám sát trên thiết bị di động.
+      </p>
+      <div class="highlight">
+        <strong>Ý nghĩa của đề tài:</strong> Đề tài không hướng tới việc thay thế toàn bộ hệ thống NOC/SOC hiện hữu, mà tập trung tạo ra một lớp giám sát thông minh, an toàn và có tính cơ động cao, phù hợp với yêu cầu thực tiễn trong môi trường cơ quan nhà nước.
+      </div>
+      <div class="quote">
+        <strong>Vấn đề khoa học – thực tiễn cần giải quyết:</strong> Làm thế nào để dữ liệu giám sát trong mạng WAN chuyên dùng có thể được cung cấp ra thiết bị di động qua Internet một cách an toàn, có kiểm soát, đồng thời bảo đảm người dùng nhận được thông tin ngắn gọn, chính xác, có thứ tự ưu tiên và hỗ trợ ra quyết định nhanh.
+      </div>
+    </section>
+
+    <section class="section" id="muc-tieu">
+      <h2>2. Mục tiêu nghiên cứu</h2>
+      <h3>2.1. Mục tiêu tổng quát</h3>
+      <p>
+        Nghiên cứu và xây dựng phần mềm giám sát trên thiết bị di động cho hệ thống NOC/SOC trong các cơ quan nhà nước, trong đó ứng dụng trí tuệ nhân tạo để hỗ trợ phân tích dữ liệu giám sát, phát hiện bất thường, ưu tiên cảnh báo; đồng thời đề xuất mô hình kết nối an toàn để phân phối dữ liệu cần thiết từ mạng WAN chuyên dùng ra môi trường Internet phục vụ công tác giám sát, chỉ đạo và điều hành.
+      </p>
+
+      <h3>2.2. Mục tiêu cụ thể</h3>
+      <div class="grid">
+        <div class="mini"><h4>Mục tiêu 1</h4><p>Khảo sát hiện trạng hạ tầng mạng WAN chuyên dùng, các hệ thống giám sát NOC/SOC đang vận hành, nguồn dữ liệu đầu vào, mô hình tổ chức trực giám sát và quy trình tiếp nhận – xử lý cảnh báo.</p></div>
+        <div class="mini"><h4>Mục tiêu 2</h4><p>Phân tích yêu cầu kỹ thuật và yêu cầu an toàn thông tin đối với việc cung cấp dữ liệu giám sát từ mạng nội bộ ra thiết bị di động sử dụng Internet công cộng.</p></div>
+        <div class="mini"><h4>Mục tiêu 3</h4><p>Đề xuất kiến trúc tích hợp dữ liệu và kiến trúc công bố dữ liệu an toàn thông qua các lớp trung gian như máy chủ tích hợp, vùng DMZ, API Gateway hoặc cơ chế truy cập an toàn tương đương.</p></div>
+        <div class="mini"><h4>Mục tiêu 4</h4><p>Lựa chọn và đề xuất mô hình AI phù hợp để phát hiện bất thường, ưu tiên cảnh báo, giảm nhiễu thông tin và hỗ trợ tóm tắt sự cố theo hướng dễ hiểu, phù hợp với màn hình di động.</p></div>
+        <div class="mini"><h4>Mục tiêu 5</h4><p>Thiết kế và xây dựng prototype phần mềm giám sát theo mô hình ứng dụng web/PWA đa nền tảng phục vụ hiển thị bảng điều khiển, cảnh báo ưu tiên, thống kê theo khu vực, theo thiết bị, theo mức độ ảnh hưởng và diễn biến sự cố.</p></div>
+        <div class="mini"><h4>Mục tiêu 6</h4><p>Thử nghiệm, đánh giá và phân tích hiệu quả của giải pháp theo các tiêu chí về an toàn kết nối, chất lượng thông tin cảnh báo, tính hữu dụng đối với người vận hành và khả năng ứng dụng trong thực tiễn.</p></div>
+      </div>
+      
+    </section>
+
+    <section class="section" id="pham-vi">
+      <h2>3. Phạm vi nghiên cứu</h2>
+      <h3>3.1. Phạm vi nội dung</h3>
+      <ul>
+        <li>Nghiên cứu giải pháp phần mềm giám sát trên thiết bị di động phục vụ hệ thống NOC/SOC trong môi trường cơ quan nhà nước.</li>
+        <li>Tập trung vào bài toán khai thác dữ liệu từ mạng WAN chuyên dùng, xử lý và công bố có kiểm soát ra Internet, không mở truy cập trực tiếp vào hệ thống lõi.</li>
+        <li>Ưu tiên hai nhóm chức năng AI: phát hiện bất thường và xếp hạng mức độ ưu tiên cảnh báo.</li>
+      </ul>
+      <h3>3.2. Phạm vi đối tượng giám sát</h3>
+      <ul>
+        <li>Các nút mạng trong mô hình WAN chuyên dùng tại trung ương, tỉnh, huyện, xã và một số đơn vị trực thuộc.</li>
+        <li>Các nhóm thiết bị chính: router, firewall, switch, máy chủ; có thể tham chiếu bổ sung máy trạm và các thiết bị đầu cuối khi cần.</li>
+        <li>Các nguồn dữ liệu điển hình từ Riverbed, LogRhythm, EDR, Tenable, IPS và log/metric thu thập từ thiết bị mạng.</li>
+      </ul>
+      <h3>3.3. Phạm vi công nghệ</h3>
+      <ul>
+        <li>Giải pháp phía người dùng cuối được định hướng theo mô hình ứng dụng web hoặc ứng dụng web tiến bộ (PWA), bảo đảm khả năng sử dụng trên cả Android và iOS thông qua trình duyệt, đồng thời có thể cung cấp trải nghiệm gần với phần mềm cài đặt trực tiếp trên hệ điều hành khi cần.</li>
+        <li>Xây dựng prototype ở mức nghiên cứu, thử nghiệm và đánh giá; chưa thay thế hoàn toàn hệ thống giám sát hiện có.</li>
+        <li>Hệ thống di động chỉ truy cập lớp dịch vụ trung gian công bố dữ liệu, không truy cập trực tiếp vùng NOC/SOC lõi.</li>
+        <li>Mô hình trí tuệ nhân tạo được huấn luyện trên dữ liệu thực tế hoặc dữ liệu mô phỏng có cấu trúc tương đồng với môi trường vận hành.</li>
+      </ul>
+      <h3>3.4. Phạm vi người dùng</h3>
+      <ul>
+        <li>Nhân sự trực NOC và SOC.</li>
+        <li>Cán bộ quản trị mạng, cán bộ phụ trách an toàn thông tin.</li>
+        <li>Trưởng ca, cán bộ quản lý kỹ thuật hoặc lãnh đạo cần theo dõi nhanh tình trạng hệ thống trên thiết bị di động.</li>
+      </ul>
+      <h3>3.5. Giới hạn nghiên cứu</h3>
+      <ul>
+        <li>Đề tài không xây dựng lại toàn bộ hạ tầng NOC/SOC, mà bổ sung lớp giám sát thông minh trên di động.</li>
+        <li>Đề tài chưa đi sâu vào việc điều khiển thiết bị từ xa hoặc thực hiện phản ứng tự động trực tiếp từ điện thoại lên mạng lõi.</li>
+        <li>Thông tin công bố ra Internet được giới hạn ở dữ liệu đã xử lý, đã chọn lọc, hạn chế tối đa log thô hoặc dữ liệu nhạy cảm.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="phuong-phap">
+      <h2>4. Phương pháp nghiên cứu</h2>
+      <h3>4.1. Phương pháp nghiên cứu lý thuyết</h3>
+      <ul>
+        <li>Nghiên cứu tài liệu về giám sát mạng, NOC, SOC, kiến trúc WAN chuyên dùng, an toàn hệ thống thông tin, API bảo mật, DMZ, VPN, xác thực nhiều yếu tố và các phương pháp học máy trong phân tích cảnh báo.</li>
+        <li>Phân tích cơ sở pháp lý, chuẩn kỹ thuật, quy định quản lý và các mô hình triển khai phù hợp với môi trường cơ quan nhà nước.</li>
+      </ul>
+      <h3>4.2. Phương pháp điều tra, khảo sát thực tiễn</h3>
+      <ul>
+        <li>Khảo sát hiện trạng hạ tầng mạng, quy trình trực giám sát, nhóm người dùng, loại cảnh báo và khó khăn trong giám sát từ xa.</li>
+        <li>Phỏng vấn hoặc thu thập ý kiến của cán bộ vận hành để xác định nhu cầu thông tin thực sự cần hiển thị trên thiết bị di động.</li>
+      </ul>
+      <h3>4.3. Phương pháp phân tích – thiết kế hệ thống</h3>
+      <p>Trong phạm vi đề tài, lớp trình diễn phía người dùng được phân tích theo hướng ứng dụng web/PWA để bảo đảm một mã nguồn có thể phục vụ đồng thời nhiều nền tảng, giảm chi phí triển khai và vận hành so với việc phát triển riêng ứng dụng Android và iOS.</p>
+      <ul>
+        <li>Phân tích yêu cầu chức năng, yêu cầu phi chức năng, yêu cầu an toàn thông tin và yêu cầu mở rộng hệ thống.</li>
+        <li>Thiết kế kiến trúc dữ liệu, luồng xử lý, mô hình tích hợp liên thông, mô hình công bố dữ liệu và giao diện giám sát di động.</li>
+      </ul>
+      <h3>4.4. Phương pháp thực nghiệm</h3>
+      <ul>
+        <li>Xây dựng prototype hệ thống, mô phỏng luồng dữ liệu từ mạng nội bộ ra lớp trung gian và tới ứng dụng di động.</li>
+        <li>Huấn luyện và thử nghiệm mô hình AI trên tập dữ liệu đã chuẩn hóa.</li>
+      </ul>
+      <h3>4.5. Phương pháp đánh giá – so sánh</h3>
+      <ul>
+        <li>Đánh giá độ chính xác, độ bao phủ và khả năng ưu tiên cảnh báo của mô hình AI.</li>
+        <li>So sánh quy trình xử lý sự cố trước và sau khi áp dụng giải pháp đề xuất về thời gian nhận biết, khả năng sàng lọc và mức độ hỗ trợ ra quyết định.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="doi-tuong">
+      <h2>5. Đối tượng khảo sát</h2>
+      <ul>
+        <li>Hạ tầng mạng WAN chuyên dùng và các thành phần giám sát NOC/SOC trong cơ quan nhà nước hoặc mô hình tương đương.</li>
+        <li>Các nền tảng giám sát đang sử dụng tại trung tâm điều hành như Riverbed, LogRhythm, EDR, Tenable, IPS và các hệ thống hỗ trợ ghi log, cảnh báo liên quan.</li>
+        <li>Nhóm người sử dụng trực tiếp gồm cán bộ trực NOC, cán bộ trực SOC, quản trị hệ thống, cán bộ an toàn thông tin, trưởng ca và cán bộ quản lý kỹ thuật.</li>
+        <li>Các bộ dữ liệu khảo sát gồm log, event, metric, bản ghi cảnh báo, báo cáo sự cố và quy trình nghiệp vụ xử lý sự cố trong phạm vi cho phép.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="ke-hoach">
+      <h2>6. Kế hoạch thực hiện</h2>
+      <div class="chapter"><div class="num">1</div><div><h3>Giai đoạn 1. Khảo sát và xác định bài toán</h3><ul><li>Khảo sát mô hình mạng, thiết bị, hệ thống giám sát hiện có.</li><li>Xác định nhu cầu giám sát trên di động và khó khăn trong việc công bố dữ liệu ra Internet.</li><li>Chốt phạm vi nghiên cứu và bài toán AI trọng tâm.</li></ul></div></div>
+      <div class="chapter"><div class="num">2</div><div><h3>Giai đoạn 2. Nghiên cứu tài liệu và thiết kế giải pháp</h3><ul><li>Nghiên cứu các mô hình kiến trúc bảo mật phù hợp.</li><li>Thiết kế kiến trúc 4 vùng: WAN nội bộ – tích hợp/AI – DMZ/API – thiết bị di động.</li><li>Đề xuất các chính sách kiểm soát truy cập và phạm vi dữ liệu công bố.</li></ul></div></div>
+      <div class="chapter"><div class="num">3</div><div><h3>Giai đoạn 3. Chuẩn hóa dữ liệu và xây dựng mô hình AI</h3><ul><li>Thu thập, làm sạch, chuẩn hóa dữ liệu giám sát.</li><li>Lựa chọn đặc trưng, gán nhãn, huấn luyện và đánh giá mô hình AI.</li></ul></div></div>
+      <div class="chapter"><div class="num">4</div><div><h3>Giai đoạn 4. Xây dựng prototype phần mềm</h3><ul><li>Xây dựng lớp dịch vụ tích hợp và lớp công bố dữ liệu trung gian.</li><li>Phát triển ứng dụng di động và tích hợp kết quả AI vào giao diện.</li></ul></div></div>
+      <div class="chapter"><div class="num">5</div><div><h3>Giai đoạn 5. Thử nghiệm, đánh giá và hoàn thiện báo cáo</h3><ul><li>Thiết lập các kịch bản thử nghiệm tiêu biểu.</li><li>Đánh giá hệ thống, tổng hợp kết quả, hoàn thiện báo cáo khoa học và đề xuất hướng phát triển.</li></ul></div></div>
+    </section>
+
+    
+    <section class="section" id="webapp-pwa">
+      <h2>7. Định hướng phần mềm phục vụ người sử dụng theo mô hình ứng dụng web / PWA</h2>
+      <p>
+        Để bảo đảm khả năng sử dụng đồng thời trên cả Android và iOS, đồng thời giảm chi phí phát triển và vận hành, phần mềm phục vụ người sử dụng trong đề tài được định hướng theo mô hình <strong>Ứng dụng web</strong> Hoặc <strong>Ứng dụng web tiến bộ (PWA)</strong>, thay cho phương án phát triển riêng hai ứng dụng cài đặt trực tiếp trên từng hệ điều hành. Với cách tiếp cận này, người sử dụng có thể truy cập hệ thống trực tiếp qua trình duyệt trên điện thoại, máy tính bảng hoặc máy tính cá nhân mà không bắt buộc phải cài đặt từ kho phần mềm.
+      </p>
+      <p>
+        Trong trường hợp cần tăng trải nghiệm sử dụng, hệ thống có thể được triển khai dưới dạng PWA để cho phép thêm biểu tượng ra màn hình chính, chạy ở chế độ gần giống ứng dụng cài đặt trực tiếp trên hệ điều hành, hỗ trợ lưu tạm cục bộ, tối ưu tốc độ tải và tiếp nhận một số loại thông báo đẩy tùy thuộc vào mức độ hỗ trợ của nền tảng. Cách triển khai này đặc biệt phù hợp với môi trường cơ quan nhà nước vì giúp đơn giản hóa việc cập nhật phiên bản, giảm phụ thuộc vào App Store hoặc Google Play, đồng thời dễ quản lý tập trung hơn về mặt kỹ thuật.
+      </p>
+      <h3>7.1. Lý do lựa chọn ứng dụng web / PWA</h3>
+      <ul>
+        <li>Khả năng dùng chung trên Android và iOS với một nền tảng phát triển thống nhất.</li>
+        <li>Không bắt buộc cài đặt ứng dụng; người dùng có thể truy cập qua trình duyệt khi cần.</li>
+        <li>Dễ cập nhật phiên bản, triển khai thay đổi giao diện hoặc chức năng mà không phải phát hành lại ứng dụng lên kho phần mềm.</li>
+        <li>Phù hợp với mô hình công bố dữ liệu qua API Gateway/DMZ và khai thác từ xa thông qua Internet có kiểm soát.</li>
+        <li>Giảm chi phí duy trì so với việc phát triển và bảo trì đồng thời hai ứng dụng cài đặt trực tiếp trên hệ điều hành riêng biệt.</li>
+      </ul>
+      <h3>7.2. Những điểm cần lưu ý</h3>
+      <ul>
+        <li>Một số chức năng nền sâu hoặc thông báo đẩy có thể phụ thuộc vào mức độ hỗ trợ của trình duyệt và hệ điều hành.</li>
+        <li>Cần thiết kế giao diện thích ứng đa kích thước màn hình và tối ưu hiệu năng mạng để bảo đảm trải nghiệm tốt trong điều kiện kết nối thực tế.</li>
+        <li>Cần kết hợp xác thực mạnh, quản lý phiên và bảo vệ dữ liệu cục bộ trên thiết bị nếu cho phép lưu tạm hoặc lưu trạng thái đăng nhập.</li>
+      </ul>
+
+      <h3>7.3. Hình ảnh minh họa giao diện</h3>
+      <div style="text-align: center; margin: 24px 0;">
+        <img src="mobile_dashboard.png" alt="Minh hoạ Bảng điều khiển Giám sát trên thiết bị di động" style="max-width: 100%; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--line);">
+        <p style="font-size: 13px; color: var(--muted); margin-top: 8px;"><em>Hình 1. Giao diện (Dashboard) giám sát mạng trên ứng dụng di động</em></p>
+      </div>
+    </section>
+
+
+    <section class="section" id="so-do">
+      <h2>8. Sơ đồ kiến trúc đề xuất</h2>
+      <p>
+        Sơ đồ dưới đây mô tả kiến trúc công bố dữ liệu giám sát từ mạng WAN chuyên dùng ra thiết bị di động theo nguyên tắc an toàn, phân lớp và kiểm soát truy cập chặt chẽ. Đây là điểm nhấn quan trọng của đề tài vì vừa thể hiện đặc thù môi trường nhà nước, vừa giải thích được cách thức triển khai giải pháp trong thực tế.
+      </p>
+
+      <div class="svg-wrap">
+        <div class="diagram-grid">
+          <div class="zone blue">
+            <div class="zone-label">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M3 7h18"></path><path d="M6 7v10"></path><path d="M18 7v10"></path><path d="M3 17h18"></path><path d="M8 12h8"></path></svg>
+              Vùng 1 · Mạng WAN chuyên dùng nội bộ
+            </div>
+            <div class="card">
+              <h4><svg class="icon" viewBox="0 0 24 24"><path d="M4 12h4"></path><path d="M16 12h4"></path><path d="M12 4v4"></path><path d="M12 16v4"></path><circle cx="12" cy="12" r="4"></circle></svg>Thiết bị tại các cấp quản lý</h4>
+              <p>Router, firewall, switch, máy chủ, máy trạm và các thiết bị đầu cuối được kết nối trên đường truyền riêng, không công khai trực tiếp ra Internet.</p>
+              <ul class="mini-list">
+                <li>Giám sát hạ tầng, đường truyền, thiết bị và dịch vụ</li>
+                <li>Thu thập log, event, metric từ nhiều điểm mạng</li>
+                <li>Dữ liệu gốc chỉ lưu thông trong vùng nội bộ</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4><svg class="icon" viewBox="0 0 24 24"><path d="M4 19h16"></path><path d="M5 15l4-4 4 3 6-7"></path></svg>Hệ thống NOC / SOC lõi</h4>
+              <p>NOC có thể sử dụng Riverbed; SOC có thể tích hợp LogRhythm, EDR, Tenable, IPS và các hệ thống chuyên dụng khác.</p>
+            </div>
+            <div class="connector"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></div>
+          </div>
+
+          <div class="zone green">
+            <div class="zone-label">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"></path><path d="M9 12l2 2 4-4"></path></svg>
+              Vùng 2 · Tích hợp và AI trong nội bộ
+            </div>
+            <div class="card">
+              <h4><svg class="icon" viewBox="0 0 24 24"><path d="M7 4h10l3 3v13H4V4h3z"></path><path d="M8 12h8"></path><path d="M8 16h5"></path></svg>Bộ thu thập dữ liệu / Bộ chuẩn hóa dữ liệu</h4>
+              <p>Thu thập dữ liệu từ nhiều nguồn, chuẩn hóa định dạng, giảm trùng lặp, gắn nhãn theo địa bàn, loại thiết bị, mức ảnh hưởng và trạng thái sự cố.</p>
+            </div>
+            <div class="card">
+              <h4><svg class="icon" viewBox="0 0 24 24"><path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M4.93 4.93l2.83 2.83"></path><path d="M16.24 16.24l2.83 2.83"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><path d="M4.93 19.07l2.83-2.83"></path><path d="M16.24 7.76l2.83-2.83"></path><circle cx="12" cy="12" r="4"></circle></svg>Mô-đun AI phân tích</h4>
+              <p>Thực hiện phát hiện bất thường, chấm điểm mức độ ưu tiên, gom nhóm cảnh báo có liên quan và tạo bản tóm tắt phục vụ người dùng di động.</p>
+            </div>
+            <div class="card">
+              <h4><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M7 15h.01"></path><path d="M11 15h2"></path></svg>Kho dữ liệu công bố chọn lọc</h4>
+              <p>Chỉ lưu giữ và đồng bộ các bản ghi sự cố, bảng điều khiển tóm tắt và chỉ số đã được xử lý; không công bố trực tiếp log thô hoặc dữ liệu nhạy cảm.</p>
+            </div>
+            <div class="connector"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></div>
+          </div>
+
+          <div class="zone orange">
+            <div class="zone-label">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M5 12a7 7 0 0 1 14 0"></path><path d="M12 12v9"></path><path d="M8 18h8"></path></svg>
+              Vùng 3 · DMZ / API Gateway công bố dữ liệu
+            </div>
+            <div class="card">
+              <h4><svg class="icon" viewBox="0 0 24 24"><path d="M5 13a7 7 0 0 1 14 0v6H5v-6z"></path><path d="M8 13V9a4 4 0 1 1 8 0v4"></path></svg>Cửa ngõ bảo mật trung gian</h4>
+              <p>Đặt tại vùng DMZ hoặc vùng liên mạng có kiểm soát; tiếp nhận dữ liệu đã chọn lọc từ vùng nội bộ và chỉ công bố các API cần thiết cho thiết bị di động.</p>
+            </div>
+            <div class="card">
+              <h4><svg class="icon" viewBox="0 0 24 24"><path d="M8 12h8"></path><path d="M12 8v8"></path><rect x="3" y="4" width="18" height="16" rx="2"></rect></svg>API Gateway / Bộ chuyển tiếp truy cập ngược (Reverse Proxy) / Dịch vụ đồng bộ</h4>
+              <p>Kết hợp mã hóa TLS, xác thực nhiều lớp, mã phiên truy cập theo phiên, phân quyền theo vai trò, ghi log truy cập, giới hạn tần suất truy vấn và cơ chế kiểm soát thiết bị đầu cuối.</p>
+              <ul class="mini-list">
+                <li>Không cho thiết bị di động truy cập vào NOC/SOC lõi</li>
+                <li>Chỉ công bố dữ liệu đã được cho phép</li>
+                <li>Có thể kết hợp VPN hoặc mô hình Zero Trust</li>
+              </ul>
+            </div>
+            <div class="connector"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></div>
+          </div>
+
+          <div class="zone red">
+            <div class="zone-label">
+              <svg class="icon" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"></rect><path d="M11 18h2"></path></svg>
+              Vùng 4 · Internet và ứng dụng thiết bị di động
+            </div>
+            <div class="card">
+              <h4><svg class="icon" viewBox="0 0 24 24"><path d="M8 18l4 4 4-4"></path><path d="M12 2v20"></path></svg>Ứng dụng web / PWA trên thiết bị di động</h4>
+              <p>Người dùng truy cập qua Internet để theo dõi bảng điều khiển, cảnh báo ưu tiên, diễn biến sự cố, phạm vi ảnh hưởng và bản tóm tắt AI theo đúng quyền được cấp.</p>
+            </div>
+            <div class="card">
+              <h4><svg class="icon" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 16 0"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="M12 20a8 8 0 0 0 0-16"></path></svg>Kết nối có kiểm soát</h4>
+              <p>Thiết bị di động chỉ làm việc với lớp API công bố dữ liệu; mọi truy cập được xác thực, mã hóa, ghi nhận và giám sát để giảm rủi ro lộ lọt thông tin.</p>
+            </div>
+            <div class="card">
+              <h4><svg class="icon" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>Chức năng chính trên thiết bị di động</h4>
+              <p>Nhận thông báo đẩy, lọc cảnh báo theo khu vực và thiết bị, xem chi tiết sự cố, tra cứu lịch sử và theo dõi trạng thái xử lý gần thời gian thực.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>8.1. Thuyết minh sơ đồ</h3>
+      <p>
+        Về mặt nguyên tắc, dữ liệu giám sát được hình thành và lưu thông trước hết trong vùng mạng WAN chuyên dùng. Đây là vùng có tính chất lõi, yêu cầu bảo vệ cao và không mở truy cập từ Internet công cộng. Tại vùng này, hệ thống NOC/SOC thực hiện thu thập dữ liệu vận hành, log bảo mật và các chỉ số giám sát từ toàn bộ thiết bị, dịch vụ trên mạng.
+      </p>
+      <p>
+        Ở lớp thứ hai, máy chủ tích hợp và mô-đun AI đóng vai trò xử lý trung gian. Tại đây, dữ liệu được chuẩn hóa, chọn lọc, giảm nhiễu, chấm điểm mức độ ưu tiên và chuyển đổi thành thông tin có ý nghĩa điều hành. Chỉ những nội dung cần thiết cho giám sát di động mới được đưa vào kho dữ liệu công bố chọn lọc.
+      </p>
+      <p>
+        Ở lớp thứ ba, vùng DMZ hoặc API Gateway giữ vai trò là cửa ngõ công bố dữ liệu ra ngoài. Lớp này có nhiệm vụ tiếp nhận dữ liệu đã xử lý từ nội bộ, áp dụng các chính sách bảo vệ bổ sung và cung cấp API hoặc dịch vụ truy cập có kiểm soát cho thiết bị di động. Nhờ vậy, thiết bị di động không phải và không được truy cập trực tiếp vào các máy chủ NOC/SOC lõi.
+      </p>
+      <p>
+        Ở lớp thứ tư, ứng dụng di động khai thác dữ liệu thông qua Internet công cộng nhưng trong phạm vi được cấp quyền. Cách tiếp cận này bảo đảm tính cơ động của người dùng, đồng thời vẫn duy trì nguyên tắc an toàn thông tin, tách biệt mạng lõi với môi trường Internet.
+      </p>
+      
+    </section>
+
+    
+    <section class="section" id="luong-du-lieu">
+      <h2>9. Luồng dữ liệu tổng thể của hệ thống</h2>
+      <p>
+        Luồng dữ liệu của hệ thống được thiết kế theo hướng một chiều có kiểm soát, bảo đảm dữ liệu đi từ vùng mạng nội bộ ra lớp công bố trung gian trước khi được khai thác trên thiết bị di động. Cách tổ chức này giúp hạn chế nguy cơ truy cập ngược từ Internet vào mạng WAN chuyên dùng, đồng thời tạo điều kiện kiểm soát chặt chẽ phạm vi dữ liệu được chia sẻ.
+      </p>
+
+      <div class="flow-diagram">
+        <div class="flow-step">
+          <h4>Bước 1. Thu thập dữ liệu tại mạng WAN nội bộ</h4>
+          <p>Dữ liệu log, event, metric và trạng thái thiết bị được thu thập từ router, firewall, switch, máy chủ và các nền tảng NOC/SOC lõi trong mạng chuyên dùng.</p>
+          <div class="flow-arrow"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></div>
+        </div>
+        <div class="flow-step">
+          <h4>Bước 2. Chuẩn hóa và phân tích tại lớp tích hợp</h4>
+          <p>Dữ liệu được làm sạch, loại bỏ trùng lặp, gắn nhãn và đưa vào mô-đun AI để phát hiện bất thường, ưu tiên cảnh báo và tóm tắt sự cố.</p>
+          <div class="flow-arrow"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></div>
+        </div>
+        <div class="flow-step">
+          <h4>Bước 3. Đồng bộ dữ liệu chọn lọc ra vùng DMZ</h4>
+          <p>Chỉ những dữ liệu cần thiết cho mục đích giám sát di động mới được đồng bộ sang API Gateway hoặc vùng DMZ, sau khi áp dụng chính sách ẩn thông tin nhạy cảm.</p>
+          <div class="flow-arrow"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></div>
+        </div>
+        <div class="flow-step">
+          <h4>Bước 4. Cung cấp cho thiết bị di động qua Internet</h4>
+          <p>Ứng dụng di động khai thác dữ liệu qua Internet công cộng thông qua API an toàn, có xác thực, mã hóa đường truyền, phân quyền truy cập và ghi nhận nhật ký truy cập.</p>
+        </div>
+      </div>
+
+      <h3>9.1. Nguyên tắc thiết kế luồng dữ liệu</h3>
+      <ul>
+        <li>Không cho phép thiết bị di động truy cập trực tiếp vào hệ thống NOC/SOC lõi trong mạng WAN chuyên dùng.</li>
+        <li>Chỉ công bố dữ liệu đã được xử lý, chọn lọc và phù hợp với quyền hạn của người sử dụng.</li>
+        <li>Bảo đảm khả năng truy vết, ghi log, xác thực và kiểm soát phiên làm việc đối với mọi truy cập từ Internet.</li>
+        <li>Ưu tiên cơ chế đồng bộ một chiều hoặc cơ chế truy xuất có kiểm soát qua vùng trung gian.</li>
+      </ul>
+    </section>
+
+
+    
+    <section class="section" id="mo-hinh-ai">
+      <h2>10. Các mô hình trí tuệ nhân tạo phù hợp với nhu cầu của đề tài</h2>
+      <p>
+        Trong bài toán giám sát NOC/SOC cho mạng WAN chuyên dùng, dữ liệu đầu vào chủ yếu là log, event, metric, trạng thái thiết bị, cảnh báo bảo mật và lịch sử sự cố. Đây là dạng dữ liệu bảng, dữ liệu chuỗi thời gian và dữ liệu sự kiện không đồng nhất. Vì vậy, việc lựa chọn mô hình AI cần bám sát đặc trưng dữ liệu, yêu cầu giải thích kết quả, khả năng triển khai trong mạng nội bộ và mức độ yêu cầu về phần cứng.
+      </p>
+
+      <h3>10.1. Nhóm mô hình phù hợp cho bài toán ưu tiên cảnh báo</h3>
+      <div class="data-table-wrap">
+        <table class="func-table">
+          <thead>
+            <tr>
+              <th style="width:18%">Mô hình</th>
+              <th style="width:26%">Phù hợp với bài toán</th>
+              <th style="width:18%">Ưu điểm</th>
+              <th style="width:18%">Hạn chế</th>
+              <th style="width:20%">Mức phù hợp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Logistic Regression</strong></td>
+              <td>Phân loại mức ưu tiên cảnh báo ở mức cơ bản khi dữ liệu đã được gán nhãn tương đối rõ.</td>
+              <td>Dễ huấn luyện, dễ giải thích, yêu cầu phần cứng thấp, phù hợp dữ liệu bảng.</td>
+              <td>Khả năng mô hình hóa quan hệ phi tuyến hạn chế, khó phản ánh tương tác phức tạp.</td>
+              <td>Phù hợp cho giai đoạn khởi đầu hoặc làm mô hình chuẩn đối chiếu.</td>
+            </tr>
+            <tr>
+              <td><strong>Decision Tree / Random Forest</strong></td>
+              <td>Chấm điểm ưu tiên cảnh báo dựa trên các thuộc tính như loại thiết bị, nguồn cảnh báo, thời gian kéo dài, số lần lặp lại.</td>
+              <td>Dễ hiểu, xử lý dữ liệu bảng tốt, ít yêu cầu tiền xử lý phức tạp.</td>
+              <td>Random Forest khó giải thích chi tiết hơn Logistic Regression; mô hình lớn có thể chậm hơn khi suy luận hàng loạt.</td>
+              <td>Rất phù hợp với bài toán giám sát mạng ở cấp độ doanh nghiệp/cơ quan.</td>
+            </tr>
+            <tr>
+              <td><strong>XGBoost / LightGBM / CatBoost</strong></td>
+              <td>Phân loại hoặc chấm điểm ưu tiên cảnh báo với dữ liệu bảng nhiều đặc trưng và quan hệ phi tuyến.</td>
+              <td>Hiệu quả cao trên dữ liệu bảng, độ chính xác tốt, huấn luyện nhanh, hỗ trợ mức độ quan trọng của biến đầu vào.</td>
+              <td>Cần hiệu chỉnh tham số; mức giải thích trực quan với người không chuyên thấp hơn Decision Tree đơn lẻ.</td>
+              <td><strong>Phù hợp nhất</strong> Cho bài toán xếp hạng và phân loại cảnh báo trong đề tài.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>10.2. Nhóm mô hình phù hợp cho bài toán phát hiện bất thường</h3>
+      <div class="data-table-wrap">
+        <table class="func-table">
+          <thead>
+            <tr>
+              <th style="width:18%">Mô hình</th>
+              <th style="width:26%">Phù hợp với dữ liệu</th>
+              <th style="width:18%">Ưu điểm</th>
+              <th style="width:18%">Hạn chế</th>
+              <th style="width:20%">Mức phù hợp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Isolation Forest</strong></td>
+              <td>Dữ liệu bảng hoặc vector đặc trưng tổng hợp từ log, metric, trạng thái thiết bị.</td>
+              <td>Không cần quá nhiều nhãn, phát hiện điểm dữ liệu bất thường hiệu quả, triển khai nhẹ.</td>
+              <td>Khó giải thích nguyên nhân sâu; kết quả phụ thuộc vào cách xây dựng đặc trưng.</td>
+              <td><strong>Rất phù hợp</strong> Cho phát hiện bất thường ban đầu trong môi trường WAN.</td>
+            </tr>
+            <tr>
+              <td><strong>One-Class SVM</strong></td>
+              <td>Dữ liệu bình thường nhiều, dữ liệu bất thường ít hoặc khó gán nhãn.</td>
+              <td>Phù hợp với học một lớp; hữu ích khi chỉ có dữ liệu vận hành bình thường.</td>
+              <td>Khó scale với tập dữ liệu lớn; nhạy với tham số; chi phí tính toán cao hơn Isolation Forest.</td>
+              <td>Phù hợp ở quy mô vừa và dữ liệu đã được lọc kỹ.</td>
+            </tr>
+            <tr>
+              <td><strong>Autoencoder</strong></td>
+              <td>Dữ liệu nhiều chiều, có thể là chuỗi metric hoặc vector đặc trưng từ nhiều nguồn cảnh báo.</td>
+              <td>Học được cấu trúc phức tạp; phát hiện sai khác dựa trên lỗi tái tạo.</td>
+              <td>Cần dữ liệu đủ lớn; khó giải thích; yêu cầu tài nguyên và kỹ năng huấn luyện cao hơn.</td>
+              <td>Phù hợp khi hệ thống đã có đủ dữ liệu lịch sử và cần nâng độ tinh vi.</td>
+            </tr>
+            <tr>
+              <td><strong>LSTM / GRU</strong></td>
+              <td>Chuỗi thời gian như băng thông, độ trễ, CPU, memory, số lượng alert theo thời gian.</td>
+              <td>Phù hợp dữ liệu chuỗi thời gian, có thể học xu hướng và tính mùa vụ.</td>
+              <td>Huấn luyện phức tạp hơn, cần dữ liệu chuỗi đủ dài; khó giải thích; cần tài nguyên nhiều hơn.</td>
+              <td>Phù hợp cho bài toán dự báo và phát hiện bất thường theo thời gian ở giai đoạn phát triển sau.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>10.3. Nhóm mô hình hỗ trợ tương quan sự kiện và tóm tắt</h3>
+      <div class="data-table-wrap">
+        <table class="func-table">
+          <thead>
+            <tr>
+              <th style="width:18%">Mô hình / hướng tiếp cận</th>
+              <th style="width:28%">Ứng dụng</th>
+              <th style="width:18%">Ưu điểm</th>
+              <th style="width:18%">Hạn chế</th>
+              <th style="width:18%">Khuyến nghị</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Bộ luật nghiệp vụ (Rule-based) kết hợp Machine Learning</strong></td>
+              <td>Gom nhóm cảnh báo theo khu vực, thiết bị, thời gian và quan hệ phụ thuộc mạng.</td>
+              <td>Dễ kiểm soát, sát nghiệp vụ, giải thích rõ.</td>
+              <td>Phụ thuộc vào chất lượng luật; khó bao quát mọi tình huống.</td>
+              <td>Nên dùng ở giai đoạn đầu vì phù hợp môi trường nhà nước và dễ kiểm chứng.</td>
+            </tr>
+            <tr>
+              <td><strong>Phân cụm (K-Means, DBSCAN)</strong></td>
+              <td>Nhóm các cảnh báo có đặc trưng tương đồng, hỗ trợ nhìn ra cụm sự cố.</td>
+              <td>Hữu ích cho khám phá dữ liệu, không cần nhãn đầy đủ.</td>
+              <td>Kết quả phụ thuộc cách tạo đặc trưng; khó diễn giải với người dùng cuối nếu không có hậu xử lý.</td>
+              <td>Dùng bổ trợ trong phân tích và tiền xử lý.</td>
+            </tr>
+            <tr>
+              <td><strong>Mô hình ngôn ngữ lớn (LLM) / Xử lý ngôn ngữ tự nhiên (NLP) cỡ nhỏ nội bộ hoặc sinh tóm tắt theo mẫu (Template-based)</strong></td>
+              <td>Tạo bản mô tả ngắn gọn từ thông tin sự cố đã được chuẩn hóa.</td>
+              <td>Giúp giao diện thiết bị di động dễ hiểu hơn, hỗ trợ lãnh đạo đọc nhanh.</td>
+              <td>Nếu sử dụng mô hình ngôn ngữ quy mô lớn sẽ làm tăng yêu cầu hạ tầng và rủi ro bảo mật; cần kiểm soát chặt dữ liệu đưa vào.</td>
+              <td>Nên bắt đầu bằng mẫu định dạng kết hợp bộ luật, sau đó mới cân nhắc NLP nâng cao trong nội bộ.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>10.4. Mô hình nào phù hợp nhất với môi trường mạng WAN chuyên dùng</h3>
+      <p>
+        Xét trên các tiêu chí về tính khả thi, khả năng giải thích, chi phí triển khai, mức độ phù hợp với dữ liệu bảng/log và yêu cầu an toàn trong mạng nội bộ, hướng lựa chọn phù hợp nhất cho đề tài là:
+      </p>
+      <ul>
+        <li><strong>XGBoost hoặc LightGBM</strong> Cho bài toán ưu tiên cảnh báo.</li>
+        <li><strong>Isolation Forest</strong> Cho bài toán phát hiện bất thường ở giai đoạn đầu.</li>
+        <li><strong>Bộ luật nghiệp vụ (Rule-based) kết hợp Machine Learning</strong> Cho bài toán gom nhóm cảnh báo và sinh tóm tắt sự cố.</li>
+      </ul>
+      <p>
+        Bộ ba này có ưu điểm là không đòi hỏi hạ tầng bộ xử lý đồ họa quy mô lớn, có thể huấn luyện và vận hành trong máy chủ nội bộ tiêu chuẩn, dễ giải thích với hội đồng, đồng thời vẫn đủ thể hiện yếu tố trí tuệ nhân tạo trong bài toán giám sát.
+      </p>
+
+      <h3>10.5. Yêu cầu phần cứng dự kiến</h3>
+      <div class="data-table-wrap">
+        <table class="func-table">
+          <thead>
+            <tr>
+              <th style="width:26%">Thành phần</th>
+              <th style="width:24%">Mức tối thiểu</th>
+              <th style="width:24%">Mức khuyến nghị</th>
+              <th style="width:26%">Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Máy chủ tích hợp và huấn luyện mô hình truyền thống</strong></td>
+              <td>CPU 4–8 core, RAM 16 GB, SSD 256 GB</td>
+              <td>CPU 8–16 core, RAM 32 GB, SSD/NVMe 512 GB trở lên</td>
+              <td>Đủ cho Logistic Regression, Random Forest, XGBoost, Isolation Forest với dữ liệu bảng quy mô vừa.</td>
+            </tr>
+            <tr>
+              <td><strong>Máy chủ cho Autoencoder hoặc LSTM</strong></td>
+              <td>CPU 8 core, RAM 32 GB</td>
+              <td>CPU 16 core, RAM 64 GB, GPU tầm trung nếu dữ liệu lớn</td>
+              <td>Chỉ cần khi mở rộng sang deep learning hoặc dữ liệu chuỗi thời gian lớn.</td>
+            </tr>
+            <tr>
+              <td><strong>Máy chủ suy luận nội bộ</strong></td>
+              <td>CPU 4 core, RAM 8–16 GB</td>
+              <td>CPU 8 core, RAM 16–32 GB</td>
+              <td>Có thể tách riêng hoặc dùng chung với lớp tích hợp nếu tải chưa lớn.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>10.6. Dữ liệu đầu vào cần cung cấp cho mô hình trí tuệ nhân tạo</h3>
+      <p>Các mô hình AI không làm việc trực tiếp với log thô ở dạng tự do nếu chưa qua xử lý. Dữ liệu đầu vào nên được chuẩn hóa thành các trường có ý nghĩa nghiệp vụ, ví dụ:</p>
+      <ul>
+        <li>Mã thiết bị, loại thiết bị, địa bàn quản lý, vai trò mạng.</li>
+        <li>Loại cảnh báo, nguồn phát sinh cảnh báo, mức độ hiện tại theo hệ thống nguồn.</li>
+        <li>Thời điểm bắt đầu, thời gian kéo dài, số lần lặp lại trong khoảng thời gian xác định.</li>
+        <li>Giá trị metric liên quan như CPU, RAM, băng thông, packet loss, latency, jitter, session count.</li>
+        <li>Số lượng node bị ảnh hưởng, phạm vi ảnh hưởng, mối liên hệ với các cảnh báo khác.</li>
+        <li>Nhật ký xử lý trước đây: mức độ sự cố thực tế, thời gian khắc phục, người xử lý, nguyên nhân kết luận.</li>
+      </ul>
+      <p>
+        Trong đó, dữ liệu lịch sử sự cố đã được xác nhận bởi đội ngũ vận hành là nguồn rất quan trọng để tạo nhãn cho mô hình phân loại mức ưu tiên. Nếu chưa có dữ liệu gán nhãn tốt, có thể bắt đầu từ mô hình phát hiện bất thường không giám sát và từng bước xây dựng bộ nhãn nội bộ.
+      </p>
+
+      <h3>10.7. Phương án huấn luyện mô hình</h3>
+      <ul>
+        <li><strong>Bước 1:</strong> Thu thập dữ liệu lịch sử từ NOC/SOC, chuẩn hóa và loại bỏ bản ghi lỗi hoặc trùng lặp.</li>
+        <li><strong>Bước 2:</strong> Xây dựng đặc trưng đầu vào theo ngày, theo giờ, theo thiết bị, theo khu vực và theo loại sự cố.</li>
+        <li><strong>Bước 3:</strong> Với bài toán ưu tiên cảnh báo, sử dụng dữ liệu sự cố đã xử lý để gán nhãn như thấp, trung bình, cao, khẩn cấp hoặc theo thang điểm.</li>
+        <li><strong>Bước 4:</strong> Chia tập dữ liệu thành huấn luyện/đánh giá hiệu chỉnh/kiểm thử; huấn luyện và điều chỉnh tham số.</li>
+        <li><strong>Bước 5:</strong> Đánh giá mô hình bằng các chỉ số phù hợp; so sánh nhiều mô hình để chọn phương án tối ưu.</li>
+        <li><strong>Bước 6:</strong> Đóng gói mô hình và triển khai trong lớp tích hợp nội bộ; định kỳ tái huấn luyện theo chu kỳ tháng hoặc quý tùy mức độ biến động dữ liệu.</li>
+      </ul>
+
+      <h3>10.8. Khuyến nghị lựa chọn mô hình cho đề tài</h3>
+      <p>
+        Nếu mục tiêu là xây dựng một đề tài vừa có chiều sâu kỹ thuật, vừa khả thi trong điều kiện thực tế và thuận lợi trong quá trình thuyết minh, cấu hình lựa chọn khuyến nghị là:
+      </p>
+      <ul>
+        <li><strong>Mô hình chủ đạo:</strong> XGBoost hoặc LightGBM để chấm điểm ưu tiên cảnh báo.</li>
+        <li><strong>Mô hình hỗ trợ:</strong> Isolation Forest để phát hiện bất thường.</li>
+        <li><strong>Cơ chế nghiệp vụ:</strong> Bộ luật nghiệp vụ hoặc bảng luật để gom nhóm sự kiện và sinh mô tả sự cố.</li>
+      </ul>
+      <p>
+        Phương án này cân bằng tốt giữa hiệu quả, tính giải thích, chi phí đầu tư hạ tầng và mức độ phù hợp với môi trường mạng WAN chuyên dùng trong cơ quan nhà nước.
+      </p>
+    </section>
+
+
+    <section class="section" id="bang-chuc-nang">
+      <h2>11. Bảng mô tả chức năng chính của hệ thống</h2>
+      <p>
+        Bảng dưới đây khái quát các nhóm chức năng chủ yếu của giải pháp, làm rõ vai trò của từng thành phần và giá trị hỗ trợ đối với công tác giám sát, điều hành trên thiết bị di động.
+      </p>
+
+      <div class="data-table-wrap">
+        <table class="func-table">
+          <thead>
+            <tr>
+              <th style="width:18%">Nhóm chức năng</th>
+              <th style="width:28%">Mô tả chức năng</th>
+              <th style="width:26%">Đầu ra chính</th>
+              <th style="width:28%">Ý nghĩa đối với vận hành</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Thu thập dữ liệu</strong></td>
+              <td>Tiếp nhận log, event, metric và trạng thái thiết bị từ các nền tảng NOC/SOC và từ thiết bị mạng trong WAN chuyên dùng.</td>
+              <td>Dữ liệu giám sát đầu vào theo thời gian thực hoặc gần thời gian thực.</td>
+              <td>Tạo nền tảng dữ liệu thống nhất phục vụ phân tích, theo dõi và cảnh báo.</td>
+            </tr>
+            <tr>
+              <td><strong>Chuẩn hóa dữ liệu</strong></td>
+              <td>Làm sạch dữ liệu, loại bỏ trùng lặp, chuẩn hóa định dạng, gắn nhãn theo khu vực, thiết bị, nguồn sinh cảnh báo.</td>
+              <td>Tập dữ liệu có cấu trúc, sẵn sàng cho AI và bảng điều khiển.</td>
+              <td>Giảm nhiễu, tăng tính nhất quán và khả năng tích hợp đa nguồn.</td>
+            </tr>
+            <tr>
+              <td><strong>Phân tích AI</strong></td>
+              <td>Phát hiện bất thường, chấm điểm mức độ ưu tiên, gom nhóm cảnh báo liên quan và hỗ trợ tóm tắt sự cố.</td>
+              <td>Danh sách cảnh báo ưu tiên, sự cố nổi bật, bản tóm tắt ngắn.</td>
+              <td>Giúp cán bộ trực tập trung vào sự cố quan trọng, rút ngắn thời gian nhận biết và phản ứng.</td>
+            </tr>
+            <tr>
+              <td><strong>Công bố dữ liệu an toàn</strong></td>
+              <td>Đồng bộ dữ liệu đã chọn lọc sang vùng DMZ/API Gateway; áp dụng cơ chế xác thực, mã hóa, phân quyền và ghi log truy cập.</td>
+              <td>API an toàn và kho dữ liệu trung gian cho thiết bị di động.</td>
+              <td>Bảo đảm nguyên tắc tách biệt giữa mạng lõi và Internet công cộng.</td>
+            </tr>
+            <tr>
+              <td><strong>Bảng điều khiển ứng dụng web / PWA</strong></td>
+              <td>Hiển thị tình trạng toàn mạng, thống kê theo khu vực, loại thiết bị, mức độ ảnh hưởng và xu hướng cảnh báo.</td>
+              <td>Giao diện web thích ứng đa kích thước màn hình/PWA, màn hình tổng quan, biểu đồ, chỉ số chính.</td>
+              <td>Hỗ trợ lãnh đạo và cán bộ trực nắm nhanh tình hình hệ thống.</td>
+            </tr>
+            <tr>
+              <td><strong>Quản lý cảnh báo</strong></td>
+              <td>Hiển thị danh sách cảnh báo theo mức độ ưu tiên, hỗ trợ lọc, tìm kiếm, xem chi tiết và theo dõi trạng thái xử lý.</td>
+              <td>Danh sách sự cố, chi tiết sự cố, lịch sử cập nhật.</td>
+              <td>Tăng hiệu quả điều hành, phối hợp xử lý và giám sát tiến độ khắc phục.</td>
+            </tr>
+            <tr>
+              <td><strong>Thông báo đẩy</strong></td>
+              <td>Gửi thông báo tức thời tới thiết bị di động thông qua cơ chế đẩy của ứng dụng web/PWA khi phát sinh cảnh báo mức cao hoặc sự cố có phạm vi ảnh hưởng lớn.</td>
+              <td>Thông báo đẩy, cảnh báo khẩn trên thiết bị di động.</td>
+              <td>Giúp người dùng phát hiện nhanh sự cố, đặc biệt ngoài giờ hành chính hoặc khi đang di chuyển.</td>
+            </tr>
+            <tr>
+              <td><strong>Kiểm soát truy cập</strong></td>
+              <td>Quản lý xác thực người dùng, phân quyền theo vai trò, ghi nhận nhật ký truy cập và kiểm soát phiên làm việc.</td>
+              <td>Phiên truy cập an toàn, nhật ký kiểm tra, báo cáo truy cập.</td>
+              <td>Đáp ứng yêu cầu an toàn thông tin, truy vết và quản lý trách nhiệm sử dụng.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="de-cuong">
+      <h2>12. Đề cương chi tiết</h2>
+
+      <div class="chapter">
+        <div class="num">1</div>
+        <div>
+          <h3>Chương 1. Tổng quan về bài toán nghiên cứu</h3>
+          <ul>
+            <li>Bối cảnh chuyển đổi số và vai trò của mạng WAN chuyên dùng trong cơ quan nhà nước.</li>
+            <li>Đặc điểm của hệ thống giám sát NOC/SOC trong môi trường phân tán nhiều cấp.</li>
+            <li>Nhu cầu giám sát cơ động trên thiết bị di động trong quản lý, điều hành và ứng cứu sự cố.</li>
+            <li>Hạn chế hiện nay trong việc khai thác dữ liệu giám sát đa nguồn và khó khăn khi giám sát trên thiết bị di động.</li>
+            <li>Lý do lựa chọn đề tài, mục tiêu, đối tượng, phạm vi và phương pháp nghiên cứu.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="chapter">
+        <div class="num">2</div>
+        <div>
+          <h3>Chương 2. Cơ sở lý luận, cơ sở pháp lý và nghiên cứu liên quan</h3>
+          <ul>
+            <li>Các khái niệm cơ bản về NOC, SOC, giám sát hạ tầng, giám sát an toàn thông tin.</li>
+            <li>Cơ sở lý luận về mạng WAN chuyên dùng, phân vùng mạng, nguyên tắc kết nối liên mạng an toàn.</li>
+            <li>Các nguyên tắc về bảo vệ hệ thống thông tin, kiểm soát truy cập, bảo mật API, xác thực nhiều yếu tố.</li>
+            <li>Tổng quan về trí tuệ nhân tạo, học máy, phát hiện bất thường và phân loại cảnh báo trong lĩnh vực vận hành hệ thống.</li>
+            <li>Tình hình nghiên cứu, sản phẩm và mô hình tương tự trong nước và ngoài nước.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="chapter">
+        <div class="num">3</div>
+        <div>
+          <h3>Chương 3. Khảo sát hiện trạng và xác định bài toán cụ thể</h3>
+          <ul>
+            <li>Mô tả kiến trúc mạng WAN chuyên dùng và cấu trúc điểm mạng theo các cấp quản lý.</li>
+            <li>Khảo sát hệ thống giám sát hiện hữu, nguồn dữ liệu, loại cảnh báo và cách thức xử lý hiện nay.</li>
+            <li>Phân tích các bất cập: dữ liệu phân tán, trùng lặp, khó đánh giá mức độ nghiêm trọng, khó giám sát mọi lúc mọi nơi.</li>
+            <li>Xác định các nhóm dữ liệu cần thiết cho giám sát di động.</li>
+            <li>Xác định bài toán AI cần tập trung giải quyết trong đề tài.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="chapter">
+        <div class="num">4</div>
+        <div>
+          <h3>Chương 4. Phân tích yêu cầu và thiết kế kiến trúc hệ thống</h3>
+          <ul>
+            <li>Yêu cầu chức năng:
+              <ul>
+                <li>Thu thập và chuẩn hóa dữ liệu từ nhiều nguồn.</li>
+                <li>Phân tích bằng AI.</li>
+                <li>Cung cấp bảng điều khiển, danh sách sự cố, danh sách cảnh báo ưu tiên.</li>
+                <li>Lọc theo khu vực, theo loại thiết bị, theo mức độ ảnh hưởng.</li>
+                <li>Thông báo đẩy và theo dõi trạng thái xử lý.</li>
+              </ul>
+            </li>
+            <li>Yêu cầu phi chức năng:
+              <ul>
+                <li>An toàn thông tin và bảo mật dữ liệu.</li>
+                <li>Khả năng mở rộng và tích hợp thêm nguồn dữ liệu.</li>
+                <li>Khả năng cung cấp thông tin gần thời gian thực.</li>
+                <li>Khả năng sử dụng thuận tiện trên thiết bị di động.</li>
+              </ul>
+            </li>
+            <li>Thiết kế kiến trúc 4 vùng và luồng dữ liệu tổng thể.</li>
+            <li>Thiết kế API, phương thức xác thực, phân quyền và kiểm soát truy cập.</li>
+            <li>Thiết kế cơ sở dữ liệu và giao diện chính của ứng dụng.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="chapter">
+        <div class="num">5</div>
+        <div>
+          <h3>Chương 5. Đề xuất mô hình AI cho giám sát và ưu tiên cảnh báo</h3>
+          <ul>
+            <li>Xác định bài toán học máy: phát hiện bất thường, phân loại cảnh báo, chấm điểm ưu tiên.</li>
+            <li>Lựa chọn đặc trưng đầu vào như loại thiết bị, loại cảnh báo, tần suất lặp, thời gian kéo dài, phạm vi ảnh hưởng và mối liên hệ với các sự kiện khác.</li>
+            <li>Tiền xử lý dữ liệu, làm sạch, chuẩn hóa, gán nhãn và tạo tập dữ liệu huấn luyện.</li>
+            <li>Lựa chọn phương pháp AI phù hợp với quy mô dữ liệu và yêu cầu vận hành.</li>
+            <li>Chuyển kết quả AI thành thông tin dễ hiểu, có khả năng hỗ trợ ra quyết định trên thiết bị di động.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="chapter">
+        <div class="num">6</div>
+        <div>
+          <h3>Chương 6. Xây dựng prototype phần mềm giám sát trên thiết bị di động</h3>
+          <ul>
+            <li>Lựa chọn công nghệ xây dựng lớp tích hợp, lớp API và phần mềm phục vụ người sử dụng theo mô hình ứng dụng web/PWA đa nền tảng.</li>
+            <li>Xây dựng các module chính của hệ thống.</li>
+            <li>Tích hợp dữ liệu giám sát với mô-đun AI và tối ưu giao diện cho Android/iOS qua trình duyệt hoặc PWA.</li>
+            <li>Thiết kế giao diện web thích ứng đa kích thước màn hình và PWA bảo đảm trực quan, dễ đọc, dễ sử dụng trên điện thoại Android và iPhone, hạn chế phụ thuộc vào việc cài đặt ứng dụng từ kho phần mềm.</li>
+            <li>Mô tả các tình huống sử dụng điển hình đối với cán bộ trực NOC/SOC và cán bộ quản lý, trong đó phần mềm được truy cập qua trình duyệt hoặc triển khai dưới dạng PWA trên Android/iOS.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="chapter">
+        <div class="num">7</div>
+        <div>
+          <h3>Chương 7. Thử nghiệm và đánh giá giải pháp</h3>
+          <ul>
+            <li>Xây dựng các kịch bản thử nghiệm sát với thực tế vận hành.</li>
+            <li>Đánh giá hiệu quả của mô hình AI trong việc phát hiện bất thường và ưu tiên cảnh báo.</li>
+            <li>Đánh giá tính an toàn của mô hình công bố dữ liệu từ mạng WAN ra Internet.</li>
+            <li>Đánh giá mức độ hỗ trợ công việc trực giám sát trên thiết bị di động.</li>
+            <li>Phân tích ưu điểm, hạn chế và khả năng mở rộng triển khai trong thực tế.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="chapter">
+        <div class="num">8</div>
+        <div>
+          <h3>Chương 8. Kết luận và kiến nghị</h3>
+          <ul>
+            <li>Tổng hợp các kết quả đạt được của đề tài.</li>
+            <li>Khẳng định ý nghĩa khoa học và giá trị ứng dụng thực tiễn.</li>
+            <li>Nêu hạn chế còn tồn tại và đề xuất hướng nghiên cứu, triển khai tiếp theo.</li>
+          </ul>
+        </div>
+      </div>
+
+      
+    </section>
+
+    <section class="section" id="tai-lieu">
+      <h2>13. Danh mục tài liệu tham khảo gợi ý</h2>
+      <ol>
+        <li>Tài liệu nội bộ về mô hình mạng WAN chuyên dùng, sơ đồ kết nối, quy trình quản trị và vận hành hệ thống giám sát tại đơn vị.</li>
+        <li>Tài liệu hướng dẫn sử dụng, tài liệu kỹ thuật và tài liệu quản trị đối với các nền tảng Riverbed, LogRhythm, EDR, Tenable, IPS và các hệ thống hỗ trợ liên quan.</li>
+        <li>Các giáo trình, sách chuyên khảo và tài liệu đào tạo về quản trị mạng, trung tâm điều hành NOC/SOC, giám sát hệ thống và an toàn, an ninh thông tin.</li>
+        <li>Các tài liệu về học máy, phát hiện bất thường, phân loại cảnh báo, khai phá log và ứng dụng AI trong vận hành hệ thống.</li>
+        <li>Các tiêu chuẩn, khuyến nghị kỹ thuật và hướng dẫn về API an toàn, VPN, DMZ, xác thực nhiều yếu tố, phân quyền truy cập và bảo vệ dữ liệu.</li>
+        <li>Các bài báo khoa học, luận văn, báo cáo nghiên cứu liên quan đến giám sát mạng, giám sát an toàn thông tin, tích hợp dữ liệu và ứng dụng thiết bị di động cho vận hành kỹ thuật.</li>
+        <li>Các văn bản, quy định, hướng dẫn chuyên ngành liên quan đến bảo đảm an toàn hệ thống thông tin trong cơ quan nhà nước.</li>
+      </ol>
+    </section>
+
+    <div class="footer">
+      Tài liệu HTML được cập nhật theo hướng tăng tính khoa học, rõ kiến trúc kỹ thuật và thuận tiện sử dụng trong quá trình phát triển thành bản đề cương chính thức.
+    </div>
+  </div>
+</body>
+</html>
