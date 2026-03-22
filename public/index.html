@@ -48,7 +48,11 @@
       background:rgba(255,255,255,.9);backdrop-filter:blur(10px);
       border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:0 8px 24px rgba(23,32,51,0.06);
     }
-    .toc-title{font-size:13px;font-weight:800;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px}
+    .toc-title{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;margin:0;}
+    .toc-title::-webkit-details-marker{display:none;}
+    .toc-title::after{content:'+';font-size:18px;line-height:1;color:var(--primary);}
+    details[open].toc .toc-title{margin-bottom:12px;border-bottom:1px dashed var(--line);padding-bottom:10px;}
+    details[open].toc .toc-title::after{content:'-';}
     .toc-links{display:flex;gap:8px;flex-wrap:wrap}
     .toc a{
       text-decoration:none;color:var(--primary);background:var(--primary-soft);
@@ -230,8 +234,8 @@
       </p>
     </header>
 
-    <nav class="toc">
-      <div class="toc-title">Mục lục nhanh</div>
+    <details class="toc" id="toc-details">
+      <summary class="toc-title">Mục lục nhanh</summary>
       <div class="toc-links">
         <a href="#mo-dau">Mở đầu</a>
         <a href="#muc-tieu">Mục tiêu</a>
@@ -247,7 +251,21 @@
         <a href="#de-cuong">Đề cương chi tiết</a>
         <a href="#tai-lieu">Tài liệu tham khảo</a>
       </div>
-    </nav>
+    </details>
+    <script>
+      const toc = document.getElementById('toc-details');
+      if(window.innerWidth > 760){
+        toc.setAttribute('open','');
+      }
+      const links = toc.querySelectorAll('.toc-links a');
+      links.forEach(link => {
+        link.addEventListener('click', () => {
+          if(window.innerWidth <= 760) {
+            toc.removeAttribute('open');
+          }
+        });
+      });
+    </script>
 
     <section class="section" id="mo-dau">
       <h2>1. Phần mở đầu</h2>
